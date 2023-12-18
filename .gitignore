@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# imported lib files
+SDL2/*
+!SDL2/readme.md
+
 # User-specific files
 *.rsuser
 *.suo
