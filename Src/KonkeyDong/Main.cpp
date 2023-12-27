@@ -4,52 +4,27 @@
 #include <SDL_main.h>
 #include <iostream>
 
+#include "Components/Window.hpp"
+#include "Components/Graphics.hpp"
+
 constexpr auto SCREEN_WIDTH = 640;
 constexpr auto SCREEN_HEIGHT = 480;
 
+SDL_Rect CenterRect(int x, int y, int width, int height) {
+	return SDL_Rect{
+		.x = (int)(x - width / 2.0),
+		.y = (int)(y - height / 2.0),
+		.w = width,
+		.h = height
+	};
+}
+
 int main(int argsc, char* args[])
 {
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-		printf("SDL_Init error: %s\n", SDL_GetError());
-		return 1;
-	}
+	Window* pWindow = new Window("Main window", SCREEN_WIDTH, SCREEN_HEIGHT);
+	Graphics* pGfx = new Graphics(pWindow);
 
-	SDL_Window* pWindow = SDL_CreateWindow("Main window",
-		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-		SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-
-	if (pWindow == NULL) {
-		SDL_Quit();
-		printf("SDL_CreateWindow error: %s\n", SDL_GetError());
-		return 1;
-	};
-
-	SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
-
-	SDL_Renderer* pRenderer = SDL_CreateRenderer(pWindow, -1, 0);
-	if (pRenderer == NULL) {
-		SDL_Quit();
-		printf("SDL_CreateRenderer error: %s\n", SDL_GetError());
-		return 1;
-	};
-
-	SDL_Surface* pSurface = SDL_LoadBMP("./assets/soulKeeper.bmp");
-	if (pSurface == NULL) {
-		printf("SDL_LoadBMP(\"./assets/soulKeeper.bmp\") error: %s\n", SDL_GetError());
-		SDL_DestroyWindow(pWindow);
-		SDL_DestroyRenderer(pRenderer);
-		SDL_Quit();
-		return 1;
-	};
-
-	SDL_Texture* pTexture = SDL_CreateTextureFromSurface(pRenderer, pSurface);
-	SDL_SetTextureBlendMode(pTexture, SDL_BLENDMODE_BLEND);
-	SDL_FreeSurface(pSurface);
-	pSurface = nullptr;
-
-	int textureWidth{};
-	int textureHeight{};
-	SDL_QueryTexture(pTexture, NULL, NULL, &textureWidth, &textureHeight);
+	Texture* pTexture = new Texture("./assets/soulKeeper.bmp", pGfx);
 
 	double x = SCREEN_WIDTH / 2.0;
 	double y = SCREEN_HEIGHT / 2.0;
@@ -68,17 +43,12 @@ int main(int argsc, char* args[])
 		x += xSpeed * delta;
 		y += ySpeed * delta;
 
-		SDL_RenderClear(pRenderer);
+		pGfx->ClearBuffer();
 
-		SDL_Rect dest{};
-		dest.x = (int)(x - textureWidth / 2.0);
-		dest.y = (int)(y - textureHeight / 2.0);
-		dest.w = textureWidth;
-		dest.h = textureHeight;
-		SDL_RenderCopy(pRenderer, pTexture, NULL, &dest);
+		SDL_Rect dest = CenterRect((int)x, (int)y, pTexture->GetWidth(), pTexture->GetHeight());
+		pGfx->DrawTexture(pTexture, NULL, &dest);
 
-		SDL_RenderPresent(pRenderer);
-
+		pGfx->Present();
 
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
@@ -101,10 +71,6 @@ int main(int argsc, char* args[])
 			};
 		};
 	}
-
-	SDL_DestroyTexture(pTexture);
-	SDL_DestroyRenderer(pRenderer);
-	SDL_DestroyWindow(pWindow);
 
 	SDL_Quit();
 	return 0;
