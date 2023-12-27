@@ -1,9 +1,16 @@
 ﻿# CMakeList.txt : CMake project for KonkeyDong, include source and define
 # project specific logic here.
 #
+cmake_minimum_required (VERSION 3.12)
 
 # Add source to this project's executable.
-add_executable (KonkeyDong "KonkeyDong.cpp" "KonkeyDong.h")
+add_executable (KonkeyDong "Main.cpp" )
+
+set_property(TARGET KonkeyDong PROPERTY CXX_STANDARD 20)
+
+if ((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
+	target_compile_options(KonkeyDong PUBLIC "/Zc:__cplusplus")
+endif()
 
 #link SDL2
 set(SDL2_DIR ${CMAKE_SOURCE_DIR}/SDL2/cmake/)
@@ -18,6 +25,8 @@ add_custom_command(TARGET KonkeyDong POST_BUILD
   COMMAND_EXPAND_LISTS
   )
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET KonkeyDong PROPERTY CXX_STANDARD 20)
-endif()
+# copy assets to output folder
+add_custom_command(TARGET KonkeyDong POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory 
+  ${CMAKE_CURRENT_SOURCE_DIR}/assets ${CMAKE_CURRENT_BINARY_DIR}/assets
+  )
