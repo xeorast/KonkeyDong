@@ -7,18 +7,12 @@
 #include "Components/Window.hpp"
 #include "Components/Graphics.hpp"
 #include "Components/Timer.hpp"
+#include "GameObjects/Entity.hpp"
+
+using namespace kd::math;
 
 constexpr auto SCREEN_WIDTH = 640;
 constexpr auto SCREEN_HEIGHT = 480;
-
-SDL_Rect CenterRect(int x, int y, int width, int height) {
-	return SDL_Rect{
-		.x = (int)(x - width / 2.0),
-		.y = (int)(y - height / 2.0),
-		.w = width,
-		.h = height
-	};
-}
 
 int main(int argsc, char* args[])
 {
@@ -26,9 +20,8 @@ int main(int argsc, char* args[])
 	Graphics* pGfx = new Graphics(pWindow);
 
 	Texture* pTexture = new Texture("./assets/soulKeeper.bmp", pGfx);
+	Entity* player = new Entity(Vec2(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0), pTexture);
 
-	double x = SCREEN_WIDTH / 2.0;
-	double y = SCREEN_HEIGHT / 2.0;
 	double xSpeed = 0;
 	double ySpeed = 0;
 
@@ -38,13 +31,12 @@ int main(int argsc, char* args[])
 	{
 		double delta = timer->Mark().GetTotalSeconds();
 
-		x += xSpeed * delta;
-		y += ySpeed * delta;
+		Vec2 move(static_cast<float>(xSpeed * delta), static_cast<float>(ySpeed * delta));
+		player->Move(move);
 
 		pGfx->ClearBuffer();
 
-		SDL_Rect dest = CenterRect((int)x, (int)y, pTexture->GetWidth(), pTexture->GetHeight());
-		pGfx->DrawTexture(pTexture, NULL, &dest);
+		player->Draw(pGfx);
 
 		pGfx->Present();
 

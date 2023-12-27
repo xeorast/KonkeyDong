@@ -4,7 +4,7 @@
 cmake_minimum_required (VERSION 3.12)
 
 # Add source to this project's executable.
-add_executable (KonkeyDong "Main.cpp"  "Components/Graphics.hpp" "Components/Graphics.cpp"  "Components/Window.hpp" "Components/Window.cpp" "Components/Texture.hpp" "Components/Texture.cpp" "Components/Timer.hpp" "Components/Timer.cpp" "Data/Time.hpp")
+add_executable (KonkeyDong "Main.cpp" "Components/Graphics.hpp" "Components/Graphics.cpp" "Components/Window.hpp" "Components/Window.cpp" "Components/Texture.hpp" "Components/Texture.cpp" "Components/Timer.hpp" "Components/Timer.cpp" "Data/Time.hpp" "GameObjects/Entity.hpp" "GameObjects/Entity.cpp" "Data/Vec2.hpp" "Utils.h")
 
 set_property(TARGET KonkeyDong PROPERTY CXX_STANDARD 20)
 
