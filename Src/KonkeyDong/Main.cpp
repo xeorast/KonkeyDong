@@ -6,6 +6,7 @@
 
 #include "Components/Window.hpp"
 #include "Components/Graphics.hpp"
+#include "Components/Timer.hpp"
 
 constexpr auto SCREEN_WIDTH = 640;
 constexpr auto SCREEN_HEIGHT = 480;
@@ -31,14 +32,11 @@ int main(int argsc, char* args[])
 	double xSpeed = 0;
 	double ySpeed = 0;
 
-	int64_t t1 = SDL_GetTicks();
-	int64_t t2{};
+	Timer* timer = new Timer();
 	bool quit = false;
 	while (!quit)
 	{
-		t2 = SDL_GetTicks();
-		double delta = (t2 - t1) * 0.001;
-		t1 = t2;
+		double delta = timer->Mark().GetTotalSeconds();
 
 		x += xSpeed * delta;
 		y += ySpeed * delta;
