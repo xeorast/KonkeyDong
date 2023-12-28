@@ -8,6 +8,7 @@
 #include "Components/Graphics.hpp"
 #include "Components/Timer.hpp"
 #include "GameObjects/Entity.hpp"
+#include "Components/Keyboard.hpp"
 
 using namespace kd::math;
 
@@ -18,9 +19,10 @@ int main(int argsc, char* args[])
 {
 	Window* pWindow = new Window("Main window", SCREEN_WIDTH, SCREEN_HEIGHT);
 	Graphics* pGfx = new Graphics(pWindow);
+	Keyboard* pKbd = new Keyboard();
 
 	Texture* pTexture = new Texture("./assets/soulKeeper.bmp", pGfx);
-	Entity* player = new Entity(Vec2(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0), pTexture);
+	Entity* pPlayer = new Entity(Vec2(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0), pTexture);
 
 	double xSpeed = 0;
 	double ySpeed = 0;
@@ -29,31 +31,45 @@ int main(int argsc, char* args[])
 	bool quit = false;
 	while (!quit)
 	{
+		// get delta
 		double delta = timer->Mark().GetTotalSeconds();
 
+		// handle inputs
+		xSpeed = 0;
+		ySpeed = 0;
+		if (pKbd->IsPressed(SDLK_UP)) ySpeed += -1 * SCREEN_HEIGHT;
+		if (pKbd->IsPressed(SDLK_DOWN)) ySpeed += 1 * SCREEN_HEIGHT;
+		if (pKbd->IsPressed(SDLK_RIGHT)) xSpeed += 1 * SCREEN_WIDTH;
+		if (pKbd->IsPressed(SDLK_LEFT)) xSpeed += -1 * SCREEN_WIDTH;
+		if (pKbd->IsPressed(SDLK_LCTRL)) { xSpeed *= 2; ySpeed *= 2; }
+		if (pKbd->IsPressed(SDLK_LSHIFT)) { xSpeed /= 2; ySpeed /= 2; }
+
+		while (pKbd->HasEvent())
+		{
+			auto& e = pKbd->GetEvent();
+			if (e.IsPressKey(SDLK_ESCAPE)) quit = 1;
+		}
+
+		// update scene
 		Vec2 move(static_cast<float>(xSpeed * delta), static_cast<float>(ySpeed * delta));
-		player->Move(move);
+		pPlayer->Move(move);
 
 		pGfx->ClearBuffer();
 
-		player->Draw(pGfx);
+		pPlayer->Draw(pGfx);
 
 		pGfx->Present();
 
+		// pump events
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
 			switch (event.type) {
 			case SDL_KEYDOWN:
-				if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1;
-				else if (event.key.keysym.sym == SDLK_UP) ySpeed = -1 * SCREEN_HEIGHT;
-				else if (event.key.keysym.sym == SDLK_DOWN) ySpeed = 1 * SCREEN_HEIGHT;
-				else if (event.key.keysym.sym == SDLK_RIGHT) xSpeed = 1 * SCREEN_WIDTH;
-				else if (event.key.keysym.sym == SDLK_LEFT) xSpeed = -1 * SCREEN_WIDTH;
+				pKbd->OnClick(event.key.keysym.scancode);
 				break;
 			case SDL_KEYUP:
-				if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_DOWN) ySpeed = 0;
-				else if (event.key.keysym.sym == SDLK_RIGHT || event.key.keysym.sym == SDLK_LEFT) xSpeed = 0;
+				pKbd->OnRelease(event.key.keysym.scancode);
 				break;
 			case SDL_QUIT:
 				quit = 1;
@@ -61,6 +77,12 @@ int main(int argsc, char* args[])
 			};
 		};
 	}
+	
+	delete pKbd;
+	delete pGfx;
+	delete pWindow;
+	delete pTexture;
+	delete pPlayer;
 
 	SDL_Quit();
 	return 0;
