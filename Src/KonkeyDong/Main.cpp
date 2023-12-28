@@ -9,6 +9,7 @@
 #include "Components/Timer.hpp"
 #include "GameObjects/Entity.hpp"
 #include "Components/Keyboard.hpp"
+#include "Components/Viewport.hpp"
 
 using namespace kd::math;
 
@@ -21,11 +22,13 @@ int main(int argsc, char* args[])
 	Graphics* pGfx = new Graphics(pWindow);
 	Keyboard* pKbd = new Keyboard();
 
-	Texture* pTexture = new Texture("./assets/soulKeeper.bmp", pGfx);
-	Entity* pPlayer = new Entity(Vec2(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0), pTexture);
+	Viewport* pView = pGfx->GetViewport();
+	pView->SetVirtualWidth(40);
 
-	double xSpeed = 0;
-	double ySpeed = 0;
+	Texture* pTexture = new Texture("./assets/soulKeeper.bmp", pGfx);
+	Entity* pPlayer = new Entity(PositionF2(5, 5), SizeF2(10, 10), pTexture);
+
+	const double baseSpeed = 40;
 
 	Timer* timer = new Timer();
 	bool quit = false;
@@ -35,12 +38,12 @@ int main(int argsc, char* args[])
 		double delta = timer->Mark().GetTotalSeconds();
 
 		// handle inputs
-		xSpeed = 0;
-		ySpeed = 0;
-		if (pKbd->IsPressed(SDLK_UP)) ySpeed += -1 * SCREEN_HEIGHT;
-		if (pKbd->IsPressed(SDLK_DOWN)) ySpeed += 1 * SCREEN_HEIGHT;
-		if (pKbd->IsPressed(SDLK_RIGHT)) xSpeed += 1 * SCREEN_WIDTH;
-		if (pKbd->IsPressed(SDLK_LEFT)) xSpeed += -1 * SCREEN_WIDTH;
+		double xSpeed = 0;
+		double ySpeed = 0;
+		if (pKbd->IsPressed(SDLK_UP)) ySpeed += -1 * baseSpeed;
+		if (pKbd->IsPressed(SDLK_DOWN)) ySpeed += 1 * baseSpeed;
+		if (pKbd->IsPressed(SDLK_RIGHT)) xSpeed += 1 * baseSpeed;
+		if (pKbd->IsPressed(SDLK_LEFT)) xSpeed += -1 * baseSpeed;
 		if (pKbd->IsPressed(SDLK_LCTRL)) { xSpeed *= 2; ySpeed *= 2; }
 		if (pKbd->IsPressed(SDLK_LSHIFT)) { xSpeed /= 2; ySpeed /= 2; }
 
@@ -77,7 +80,7 @@ int main(int argsc, char* args[])
 			};
 		};
 	}
-	
+
 	delete pKbd;
 	delete pGfx;
 	delete pWindow;

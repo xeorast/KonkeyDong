@@ -6,7 +6,7 @@
 class Entity
 {
 public:
-	Entity(kd::math::Vec2 position, Texture* pTexture);
+	Entity(kd::math::PositionF2 position, kd::math::SizeF2 size, Texture* pTexture);
 	Entity(const Entity& entity) = delete;
 	Entity& operator=(const Entity&) = delete;
 
@@ -14,6 +14,7 @@ public:
 	void Move(kd::math::Vec2 distance);
 
 private:
-	kd::math::Vec2 position;
+	kd::math::PositionF2 position;
+	kd::math::SizeF2 size;
 	Texture* pTexture;
 };

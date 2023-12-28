@@ -1,16 +1,17 @@
 #include "Entity.hpp"
 #include "../Utils.h"
 
-Entity::Entity(kd::math::Vec2 position, Texture* pTexture)
+Entity::Entity(kd::math::PositionF2 position, kd::math::SizeF2 size, Texture* pTexture)
 	:
 	position(position),
+	size(size),
 	pTexture(pTexture)
 {
 }
 
 void Entity::Draw(Graphics* pGfx)
 {
-	SDL_Rect dest = CreateCenterRect(static_cast<int>(position.X), static_cast<int>(position.Y), pTexture->GetWidth(), pTexture->GetHeight());
+	SDL_FRect dest = CreateCenterFRect(position.X, position.Y, size.X, size.Y);
 	pGfx->DrawTexture(pTexture, NULL, &dest);
 }
 

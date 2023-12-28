@@ -71,4 +71,7 @@ namespace kd::math {
 		}
 
 	};
+
+	typedef Vec2 SizeF2;
+	typedef Vec2 PositionF2;
 }
