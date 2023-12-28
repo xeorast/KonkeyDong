@@ -24,19 +24,22 @@ void GlobalTimerInit()
 Timer::Timer()
 {
 	GlobalTimerInit();
-	initialMark = time_point::fromMiliseconds(SDL_GetTicks64());
+	frequency = SDL_GetPerformanceFrequency();
+	ticksPerMicrosecond = frequency / 1e6;
+
+	initialMark = GetTimestamp();
 	prevMark = initialMark;
 }
 
 kd::time::duration Timer::Peek()
 {
-	auto now = time_point::fromMiliseconds(SDL_GetTicks64());
+	auto now = GetTimestamp();
 	return now - prevMark;
 }
 
 kd::time::duration Timer::Mark()
 {
-	auto now = time_point::fromMiliseconds(SDL_GetTicks64());
+	auto now = GetTimestamp();
 	auto duration = now - prevMark;
 	prevMark = now;
 	return duration;
@@ -44,6 +47,11 @@ kd::time::duration Timer::Mark()
 
 kd::time::duration Timer::GetTotalTime()
 {
-	auto now = time_point::fromMiliseconds(SDL_GetTicks64());
+	auto now = GetTimestamp();
 	return now - initialMark;
+}
+
+kd::time::time_point Timer::GetTimestamp()
+{
+	return time_point::fromMicroseconds(SDL_GetPerformanceCounter() / ticksPerMicrosecond);
 }
